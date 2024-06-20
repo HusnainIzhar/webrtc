@@ -1,8 +1,8 @@
-"use cient";
+"use client";
 
 import { useUser } from "@clerk/nextjs";
 import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
-import { Divide, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export default function CreateMeetingPage() {
@@ -105,11 +105,25 @@ interface StartTimeInputProps {
 
 function StartTimeInput({ value, onChange }: StartTimeInputProps) {
   const [active, setActive] = useState(false);
-  const dateTimeLocalNow = new Date(
-    new Date().getTime() - new Date().getTimezoneOffset() * 60_000
-  )
-    .toString()
-    .slice(0, 16);
+  const formatDateTimeLocal = (date: Date): string => {
+    const pad = (num: number): string => String(num).padStart(2, "0");
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const getPakistanCurrentTime = (): Date => {
+    const currentUTC = new Date();
+    const utcOffset = currentUTC.getTimezoneOffset() * 60_000;
+    const pakistanOffset = 5 * 60 * 60_000;
+    return new Date(currentUTC.getTime() + utcOffset + pakistanOffset);
+  };
+
+  const dateTimeLocalNow = formatDateTimeLocal(getPakistanCurrentTime());
   return (
     <div className="space-y-2">
       <div className="font-medium">Meeting start:</div>

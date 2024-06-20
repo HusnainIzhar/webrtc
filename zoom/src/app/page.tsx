@@ -1,10 +1,11 @@
 import { SignedIn } from "@clerk/nextjs";
+import CreateMeetingPage from "./createMeetingPage";
 
 export default function Home() {
-  return ( 
+  return (
     <>
       <SignedIn>
-        <h1>hello world</h1>
+        <CreateMeetingPage />
       </SignedIn>
     </>
   );
