@@ -1,7 +1,7 @@
 import { SignedIn } from "@clerk/nextjs";
 
 export default function Home() {
-  return (
+  return ( 
     <>
       <SignedIn>
         <h1>hello world</h1>
