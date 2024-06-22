@@ -6,9 +6,11 @@ import {
   MemberRequest,
   useStreamVideoClient,
 } from "@stream-io/video-react-sdk";
-import { Loader2 } from "lucide-react";
+import { Copy, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { getUserIds } from "./actions";
+import Button from "@/components/Button";
+import Link from "next/link";
 
 export default function CreateMeetingPage() {
   const [descriptionInput, setDescriptionInput] = useState("");
@@ -38,10 +40,11 @@ export default function CreateMeetingPage() {
           (v: any, i: any, a: any) =>
             a.findIndex((v2: any) => v2.user_id === v.user_id) === i
         );
-        console.log(members)
+
       const starts_at = new Date(startTimeInput || Date.now()).toISOString();
       await call.getOrCreate({
         data: {
+          starts_at,
           members,
           custom: { description: descriptionInput },
         },
@@ -72,10 +75,10 @@ export default function CreateMeetingPage() {
           value={participantsInput}
           onChange={setParticipantsInput}
         />
-        <button onClick={createMeeting} className="w-full">
+        <Button onClick={createMeeting} className="w-full">
           {" "}
           Create Meeting
-        </button>
+        </Button>
       </div>
       {call && <MeetingLink call={call} />}
     </div>
@@ -239,5 +242,60 @@ interface MeetingLinkProps {
 
 function MeetingLink({ call }: MeetingLinkProps) {
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${call.id}`;
-  return <div className="text-center">{meetingLink}</div>;
+  return (
+    <div className="text-center flex flex-col items-center gap-3">
+      <div className="flex items-center gap-3">
+        <span>
+          Invitation link:{" "}
+          <Link href={meetingLink} className="font-medium">
+            {meetingLink}
+          </Link>
+        </span>
+        <button
+          title="Copy Link"
+          onClick={() => {
+            navigator.clipboard.writeText(meetingLink);
+            alert("Copied to Clipboard");
+          }}
+        >
+          <Copy />
+        </button>
+      </div>
+      <a
+        href={getMailtoLink(
+          meetingLink,
+          call.state.startedAt,
+          call.state.custom.description
+        )}
+        className="text-blue-500 hover:underline"
+      >
+        Send email invitation
+      </a>
+    </div>
+  );
+}
+
+function getMailtoLink(
+  meetingLink: string,
+  startsAt?: Date,
+  description?: string
+) {
+  const startDateFormatted = startsAt
+    ? startsAt.toLocaleString("en-US", {
+        dateStyle: "full",
+        timeStyle: "short",
+      })
+    : undefined;
+  const subject =
+    "Join Meeting" + (startDateFormatted ? `at ${startDateFormatted}` : "");
+
+  const body =
+    `Join my meeting at ${meetingLink}.` +
+    (startDateFormatted
+      ? `\n\nThe meeting starts at ${startDateFormatted}.`
+      : "") +
+    (description ? `n\n\Description: ${description}` : "");
+  return `mailto:?subject=${encodeURIComponent(
+    subject
+  )}&body=${encodeURIComponent(body)}`;
 }
