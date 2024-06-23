@@ -4,7 +4,7 @@ import {
   PaginatedGridLayout,
   SpeakerLayout,
 } from "@stream-io/video-react-sdk";
-import {useRouter}  from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   BetweenHorizonalEnd,
   BetweenVerticalEnd,
@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import EndCallButton from "./EndCallButton";
-
 
 type CallLayout = "speaker-vert " | "speaker-horiz" | "grid";
 export default function FlexibleCallLayout() {
@@ -24,7 +23,9 @@ export default function FlexibleCallLayout() {
     <div className="space-y-3">
       <CallLayoutButtons layout={layout} setLayout={setLayout} />
       <CallLayoutView layout={layout} />
-      <CallControls onLeave={() => navigation.push(`/meeting/${call.id}/left`)} />
+      <CallControls
+        onLeave={() => navigation.push(`/meeting/${call.id}/left`)}
+      />
       <EndCallButton />
     </div>
   );
